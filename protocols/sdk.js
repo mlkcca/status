@@ -1,46 +1,26 @@
 const Milkcocoa = require('mlkcca');
 const settings = require('../settings');
+const Req = require('./req');
 
 var milkcocoaConfig = Object.assign({}, settings.milkcocoa, {
     uuid: 'status-sdk'
 })
 
 var milkcocoa = new Milkcocoa(milkcocoaConfig);
-var ds = milkcocoa.dataStore('status-sdk')
-var counter = 0;
-var callbacks = [];
+var ds = milkcocoa.dataStore('status-sdk');
 
 ds.on('push', function(e) {
 	var counter = e.value.counter;
-	var time = e.value.time;
-	var delay = new Date().getTime() - time;
-	if(callbacks[counter]) {
-		var cb = callbacks[counter].cb
-		var timer = callbacks[counter].timer
-		if(timer) clearTimeout(timer);
-		if(cb) cb( (delay < 250)?1:2 );
-		callbacks[counter] = null;
-	}
+	Req.ack(counter);
 });
 
 module.exports = function(cb, ack_callback) {
+	var id = Req.req(cb);
 	ds.push({
 		time: new Date().getTime(),
-		counter: counter,
+		counter: id,
 		data: make_data()
 	}, ack_callback);
-	callbacks[counter] = {
-		timer: setTimeout(timeout_callback(cb), 10000),
-		cb: cb
-	}
-	counter++;
-	if(counter > 60 * 60 * 2) counter = 0;
-}
-
-function timeout_callback(cb) {
-	return function() {
-		cb(3);
-	}
 }
 
 function make_data() {

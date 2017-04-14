@@ -10,6 +10,7 @@ var num_process = Number(process.argv[3] || '1');
 
 create_worker(1, 'worker.js', ['sdk']);
 create_worker(1, 'worker.js', ['mqtt']);
+create_worker(1, 'worker.js', ['ws']);
 
 function create_worker(workerId, file, args) {
 	var worker = child_process.fork(__dirname + "/" + file, args);

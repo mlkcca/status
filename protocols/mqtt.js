@@ -1,5 +1,6 @@
 const mqtt = require('mqtt');
 const settings = require('../settings');
+const Req = require('./req');
 
 function create_mqtt_option() {
     return {
@@ -19,22 +20,13 @@ var client = mqtt.connect(
 
 
 module.exports = function(cb) {
-	var timer = setTimeout(timeout_callback(cb), 10000);
-	var time = new Date().getTime();
-	client.publish('status-mqtt', JSON.stringify({
+	var id = Req.req(cb);
+	client.publish(settings.milkcocoa.appId + '/status-mqtt', JSON.stringify({
 		time: new Date().getTime(),
 		data: make_data()
 	}), function() {
-		if(timer) clearTimeout(timer);
-		var delay = new Date().getTime() - time;
-		cb( (delay < 250)?1:2 );
+		Req.ack(id);
 	}, {qos: 1});
-}
-
-function timeout_callback(cb) {
-	return function() {
-		cb(3);
-	}
 }
 
 function make_data() {

@@ -21,16 +21,18 @@ var pubnub = new PubNub({
 
 update('sdk');
 update('mqtt');
+update('ws');
 setInterval(function() {
 	update('sdk');
 	update('mqtt');
+	update('ws');
 }, 60 * 1000);
 
 function update(type) {
 	pubnub.history({
 	        channel: type || 'sdk',
-	        reverse: true, // Setting to true will traverse the time line in reverse starting with the oldest message first.
-	        count: 60 // how many items to fetch
+	        reverse: false, // Setting to true will traverse the time line in reverse starting with the oldest message first.
+	        count: 30 // how many items to fetch
 	    },
 	    function (status, response) {
 	        // handle status, response
@@ -72,6 +74,10 @@ function showChart(type, label, data) {
 	<div>
 		<h3>SDK publish and subscribe status(min ago)</h3>
 		<div id="status-sdk"></div>
+	</div>
+	<div>
+		<h3>WebSocket publish and subscribe status(min ago)</h3>
+		<div id="status-ws"></div>
 	</div>
 	<div>
 		<h3>MQTT publish status(min ago)</h3>
