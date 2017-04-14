@@ -1,0 +1,80 @@
+<link rel="stylesheet"
+      href="./lib/chartist.css"></link>
+<style>
+	.success-line {
+		stroke: #50e250;
+	}
+	.warn-line {
+		stroke: #d2d240;
+	}
+	.error-line {
+		stroke: #da7672;
+	}
+</style>
+<script src="./lib/chartist.min.js"></script>
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.8.0.js"></script>
+<script>
+var pubnub = new PubNub({
+    //publishKey : settings.pubnub.publishKey,
+    subscribeKey : 'sub-c-346cbdca-20b9-11e7-a5a9-0619f8945a4f'
+});
+
+update('sdk');
+update('mqtt');
+setInterval(function() {
+	update('sdk');
+	update('mqtt');
+}, 60 * 1000);
+
+function update(type) {
+	pubnub.history({
+	        channel: type || 'sdk',
+	        reverse: true, // Setting to true will traverse the time line in reverse starting with the oldest message first.
+	        count: 60 // how many items to fetch
+	    },
+	    function (status, response) {
+	        // handle status, response
+	        var label = response.messages.map(function(item) {
+	        	return dateStr(item.timetoken);
+	        })
+	        var s = response.messages.map(function(item) {
+	        	return item.entry.s.s;
+	        })
+	        var w = response.messages.map(function(item) {
+	        	return item.entry.s.w;
+	        })
+	        var e = response.messages.map(function(item) {
+	        	return item.entry.s.e;
+	        })
+	        showChart(type, label, [{value:s,className: 'success-line'}, {value:w,className: 'warn-line'}, {value:e,className: 'error-line'}]);
+	    });
+}
+
+function dateStr(timetoken) {
+	var now = new Date().getTime();
+	var diff = now - Math.floor(timetoken/10000);
+	return Math.floor(diff / 1000 / 60) + 'm';
+}
+function showChart(type, label, data) {
+	new Chartist.Line('#status-' + type, {
+	  labels: label,
+	  series: data
+	}, {
+	  fullWidth: true,
+	  chartPadding: {
+	    right: 40
+	  }
+	});	
+}
+
+</script>
+<div>
+	<div>
+		<h3>SDK publish and subscribe status(min ago)</h3>
+		<div id="status-sdk"></div>
+	</div>
+	<div>
+		<h3>MQTT publish status(min ago)</h3>
+		<div id="status-mqtt"></div>
+	</div>
+</div>

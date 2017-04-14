@@ -1,0 +1,16 @@
+{
+  "name": "mlkcca-status",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mlkcca": "github:mlkcca/js",
+    "mqtt": "^2.6.2",
+    "pubnub": "^4.8.0"
+  }
+}
