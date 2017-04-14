@@ -29,12 +29,22 @@ setInterval(function() {
 }, 60 * 1000);
 
 function update(type) {
-	pubnub.history({
+	var timetoken = location.hash.substr(1) || 'latest';
+	if(timetoken == 'latest') {
+		var params = {
 	        channel: type || 'sdk',
-	        reverse: false, // Setting to true will traverse the time line in reverse starting with the oldest message first.
-	        count: 30 // how many items to fetch
-	    },
-	    function (status, response) {
+	        reverse: false,
+	        count: 30
+		}
+	}else{
+		var params = {
+	        channel: type || 'sdk',
+	        reverse: false,
+	        start: Number(timetoken),
+	        count: 30
+		}
+	}
+	pubnub.history(params, function (status, response) {
 	        // handle status, response
 	        var label = response.messages.map(function(item) {
 	        	return dateStr(item.timetoken);

@@ -3,25 +3,36 @@ const settings = require('../settings');
 const Req = require('./req');
 const url = 'wss://pubsub1.mlkcca.com/ws/push/'+settings.milkcocoa.appId+'/'+settings.milkcocoa.apiKey+'?c=status-ws';
 
-var socket = new ws(url);
 var isOpen = false;
+var socket = null;
 
-socket.on('open',function() {
-	isOpen = true;
-});
+function start_connect() {
+	socket = new ws(url);
 
-socket.on('close',function() {
-	isOpen = false;
-});
+	socket.on('open',function() {
+		isOpen = true;
+	});
 
-socket.on('message',function(data,flags) {
-	var params = JSON.parse(String(data));
-	var value = JSON.parse(params[0][2]);
-	Req.ack(value.id);
-});
+	socket.on('close',function() {
+		isOpen = false;
+		setTimeout(function() { start_connect(); }, 3000); 
+	});
 
-socket.on('error', function(err) {
-});
+	socket.on('message',function(data,flags) {
+		var params = JSON.parse(String(data));
+		var value = JSON.parse(params[0][2]);
+		Req.ack(value.id);
+	});
+
+	socket.on('error', function(err) {
+		console.error(err);
+		isOpen = false;
+		setTimeout(function() { start_connect(); }, 3000); 
+	});
+
+}
+
+start_connect();
 
 module.exports = function(cb, ack_callback) {
 	if(isOpen) {
