@@ -28,6 +28,25 @@ setInterval(function() {
 	update('ws');
 }, 60 * 1000);
 
+window.addEventListener('hashchange', function() {
+	update('sdk');
+	update('mqtt');
+	update('ws');
+});
+
+var last_timetoken = null;
+
+window.addEventListener('load', function() {
+	var prevBtn = document.getElementById('prev-btn');
+	var latestBtn = document.getElementById('latest-btn');
+	prevBtn.addEventListener('click', function(e) {
+		location.hash = last_timetoken;
+	});
+	latestBtn.addEventListener('click', function(e) {
+		location.hash = 'latest';
+	});
+});
+
 function update(type) {
 	var timetoken = location.hash.substr(1) || 'latest';
 	if(timetoken == 'latest') {
@@ -59,6 +78,10 @@ function update(type) {
 	        	return item.entry.s.e;
 	        })
 	        showChart(type, label, [{value:s,className: 'success-line'}, {value:w,className: 'warn-line'}, {value:e,className: 'error-line'}]);
+	        last_timetoken = response.messages[0].timetoken;
+	        var minAgo = document.getElementById('min-ago');
+	        minAgo.textContent = new Date(Math.floor(last_timetoken / 10000)).toLocaleString();
+	        
 	    });
 }
 
@@ -82,7 +105,11 @@ function showChart(type, label, data) {
 </script>
 <div>
 	<div>
-		<h3>SDK publish and subscribe status(min ago)</h3>
+		<button id="prev-btn">Prev</button>
+		<button id="latest-btn">Latest</button>
+	</div>
+	<div>
+		<h3>SDK publish and subscribe status(<span id="min-ago"></span>-)</h3>
 		<div id="status-sdk"></div>
 	</div>
 	<div>
