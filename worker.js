@@ -26,8 +26,8 @@ function start() {
 
 }
 
-function reqest(cb) {
-	protocol(cb);
+function reqest(cb, ack) {
+	protocol(cb, ack);
 }
 
 function send_to_master(params) {

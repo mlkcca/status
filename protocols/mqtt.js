@@ -18,13 +18,25 @@ var client = mqtt.connect(
     create_mqtt_option()
 );
 
+client.on('open', function(e) {
+	console.log('open', e);
+})
+
+client.on('close', function(e) {
+	console.log('close', e);
+})
+
+client.on('error', function(e) {
+	console.log('error', e);
+})
 
 module.exports = function(cb) {
 	var id = Req.req(cb);
 	client.publish(settings.milkcocoa.appId + '/status-mqtt', JSON.stringify({
 		time: new Date().getTime(),
 		data: make_data()
-	}), function() {
+	}), function(e) {
+		//console.log('ack', id);
 		Req.ack(id);
 	}, {qos: 1});
 }
