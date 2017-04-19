@@ -19,15 +19,15 @@ var client = mqtt.connect(
 );
 
 client.on('open', function(e) {
-	console.log('open', e);
+	console.log('open', e, new Date().toLocaleString());
 })
 
 client.on('close', function(e) {
-	console.log('close', e);
+	console.log('close', e, new Date().toLocaleString());
 })
 
 client.on('error', function(e) {
-	console.log('error', e);
+	console.log('error', e, new Date().toLocaleString());
 })
 
 module.exports = function(cb) {
